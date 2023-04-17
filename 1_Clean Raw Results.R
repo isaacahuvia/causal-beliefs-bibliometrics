@@ -18,12 +18,12 @@ WoS_2001_3000 <- convert2df(file = here("Data", "Search Results", "WoS_2001_3000
                             dbsource = "wos",
                             format = "bibtex")
 
-WoS_3001_3063 <- convert2df(file = here("Data", "Search Results", "WoS_3001_3063.bib"),
+WoS_3001_3107 <- convert2df(file = here("Data", "Search Results", "WoS_3001_3107.bib"),
                             dbsource = "wos",
                             format = "bibtex")
 
 # Combine WoS
-WoS <- bind_rows(WoS_1_1000, WoS_1001_2000, WoS_2001_3000, WoS_3001_3063)
+WoS <- bind_rows(WoS_1_1000, WoS_1001_2000, WoS_2001_3000, WoS_3001_3107)
 
 # Clean fields for matching
 EBSCO$SR <- gsub("(?<=[0-9]{4}).*$", "", EBSCO$SR, perl = T)
@@ -37,6 +37,7 @@ EBSCO_clean <- EBSCO %>%
 WoS_clean <- WoS %>%
   mutate(identifier = AU %+% PY %+% SO %+% TI)
 
+# Match
 matches <- stringdist_inner_join(select(EBSCO_clean, identifier),
                                  select(WoS_clean, identifier),
                                  by = c("identifier"),

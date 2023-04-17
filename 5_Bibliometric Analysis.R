@@ -1,4 +1,6 @@
-
+#https://aurelien-goutsmedt.com/post/extracting-biblio-data-2/
+  
+  
 ###############################
 results <- biblioAnalysis(WoS, sep = ";")
 

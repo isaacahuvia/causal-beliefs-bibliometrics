@@ -1,16 +1,25 @@
 library(tidyverse)
+library(stringr)
+
+set.seed(139560)
 
 citations <- readRDS(here("Data", "Citation Data - All Articles.rds"))
+
+n_articles <- nrow(citations)
+n_training <- n_articles * .2
+n_dual_coded <- training_articles * .1
+n_isaac <- training_articles * .45
+n_ian <- training_articles * .45
 
 citations_with_sampling <- citations %>%
   mutate(rand = runif(nrow(.))) %>%
   arrange(rand) %>%
   mutate(i = row_number(),
-         group = if_else(i <= nrow(.) / 10, "Training", "Testing"),
+         group = if_else(i <= n_training, "Training", "Testing"),
          coder = case_when(
-           i <= 100 ~ "Both",
-           i <= 500 ~ "Isaac",
-           i <= 899 ~ "Ian"
+           i <= n_dual_coded ~ "Both",
+           i <= n_dual_coded + n_isaac ~ "Isaac",
+           i <= n_dual_coded + n_isaac + n_ian ~ "Ian"
          ))
 
 count(citations_with_sampling, group, coder)
@@ -19,7 +28,7 @@ count(citations_with_sampling, group, coder)
 citations_with_sampling %>%
   filter(coder == "Both") %>%
   transmute(key = i,
-            title = TI,
+            title = str_to_title(TI),
             authors = AU,
             journal = SO,
             issn = "",
@@ -29,7 +38,7 @@ citations_with_sampling %>%
             year = PY,
             publisher = "",
             url = "",
-            abstract = AB,
+            abstract = str_to_sentence(AB),
             notes = "",
             doi = "",
             keywords = DE) %>%
@@ -38,7 +47,7 @@ citations_with_sampling %>%
 citations_with_sampling %>%
   filter(coder == "Isaac") %>%
   transmute(key = i,
-            title = TI,
+            title = str_to_title(TI),
             authors = AU,
             journal = SO,
             issn = "",
@@ -48,7 +57,7 @@ citations_with_sampling %>%
             year = PY,
             publisher = "",
             url = "",
-            abstract = AB,
+            abstract = str_to_sentence(AB),
             notes = "",
             doi = "",
             keywords = DE) %>%
@@ -57,7 +66,7 @@ citations_with_sampling %>%
 citations_with_sampling %>%
   filter(coder == "Ian") %>%
   transmute(key = i,
-            title = TI,
+            title = str_to_title(TI),
             authors = AU,
             journal = SO,
             issn = "",
@@ -67,7 +76,7 @@ citations_with_sampling %>%
             year = PY,
             publisher = "",
             url = "",
-            abstract = AB,
+            abstract = str_to_sentence(AB),
             notes = "",
             doi = "",
             keywords = DE) %>%
